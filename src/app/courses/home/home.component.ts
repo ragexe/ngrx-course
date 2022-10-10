@@ -1,49 +1,49 @@
-import { Component, OnInit } from '@angular/core'
-import { compareCourses, Course } from '../model/course'
-import { Observable } from 'rxjs'
-import { defaultDialogConfig } from '../shared/default-dialog-config'
-import { EditCourseDialogComponent } from '../edit-course-dialog/edit-course-dialog.component'
+import { ChangeDetectionStrategy, Component, OnInit, SimpleChanges } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
-import { map, shareReplay } from 'rxjs/operators'
-import { CoursesHttpService } from '../services/courses-http.service'
+import { BehaviorSubject, Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
+
+import { EditCourseDialogComponent } from '../edit-course-dialog/edit-course-dialog.component'
+import { Course } from '../model/course'
+import { CourseEntityService } from '../services/course-entity.service'
+import { defaultDialogConfig } from '../shared/default-dialog-config'
 
 @Component({
     selector: 'home',
     templateUrl: './home.component.html',
     styleUrls: ['./home.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit {
     promoTotal$: Observable<number>
 
-    loading$: Observable<boolean>
 
     beginnerCourses$: Observable<Course[]>
 
     advancedCourses$: Observable<Course[]>
 
-    constructor(private dialog: MatDialog, private coursesHttpService: CoursesHttpService) {}
+    constructor(private dialog: MatDialog, private courseEntityService: CourseEntityService) {}
 
     ngOnInit() {
         this.reload()
     }
 
+    ngOnChanges(changes: SimpleChanges): void {
+        //Called before any other lifecycle hook. Use it to inject dependencies, but avoid any serious work here.
+        //Add '${implements OnChanges}' to the class.
+        changes
+    }
+
     reload() {
-        const courses$ = this.coursesHttpService.findAllCourses().pipe(
-            map(courses => courses.sort(compareCourses)),
-            shareReplay()
-        )
-
-        this.loading$ = courses$.pipe(map(courses => !!courses))
-
-        this.beginnerCourses$ = courses$.pipe(
+        this.beginnerCourses$ = this.courseEntityService.entities$.pipe(
             map(courses => courses.filter(course => course.category == 'BEGINNER'))
         )
 
-        this.advancedCourses$ = courses$.pipe(
+        this.advancedCourses$ = this.courseEntityService.entities$.pipe(
             map(courses => courses.filter(course => course.category == 'ADVANCED'))
         )
 
-        this.promoTotal$ = courses$.pipe(
+        this.promoTotal$ = this.courseEntityService.entities$.pipe(
             map(courses => courses.filter(course => course.promo).length)
         )
     }

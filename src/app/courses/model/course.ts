@@ -11,8 +11,8 @@ export interface Course {
     promo: boolean
 }
 
-export function compareCourses(c1: Course, c2: Course) {
-    const compare = c1.seqNo - c2.seqNo
+export const coursesComparator = (leftCourse: Course, rightCourse: Course) => {
+    const compare = leftCourse.seqNo - rightCourse.seqNo
 
     if (compare > 0) {
         return 1

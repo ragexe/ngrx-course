@@ -6,14 +6,14 @@ export interface Lesson {
     courseId: number
 }
 
-export function compareLessons(l1: Lesson, l2: Lesson) {
-    const compareCourses = l1.courseId - l2.courseId
+export const lessonsComparator = (leftLesson: Lesson, rightLEsson: Lesson) => {
+    const compareCourses = leftLesson.courseId - rightLEsson.courseId
 
     if (compareCourses > 0) {
         return 1
     } else if (compareCourses < 0) {
         return -1
     } else {
-        return l1.seqNo - l2.seqNo
+        return leftLesson.seqNo - rightLEsson.seqNo
     }
 }
